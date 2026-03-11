@@ -38,6 +38,10 @@ struct Args {
     /// Prompt text (falls back to PROMPT env var)
     #[arg(long)]
     prompt: Option<String>,
+
+    /// Output file path to write the result (falls back to OUTPUT_FILE env var)
+    #[arg(long)]
+    output: Option<String>,
 }
 
 fn resolve_image_url(image: &str) -> Result<String, Box<dyn std::error::Error>> {
@@ -84,6 +88,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .or_else(|| env::var("PROMPT").ok())
         .unwrap_or_else(|| "你看见了什么？".to_string());
 
+    let output_file = args.output
+        .or_else(|| env::var("OUTPUT_FILE").ok());
+
     let image_url = resolve_image_url(&image)?;
 
     let config = OpenAIConfig::new()
@@ -117,13 +124,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let response = client.chat().create(request).await?;
 
+    let mut result = String::new();
     for choice in &response.choices {
         if let Some(content) = &choice.message.content {
-            println!("{}", content);
+            result.push_str(content);
+            result.push('\n');
         }
     }
 
+    print!("{}", result);
     std::io::stdout().flush()?;
+
+    if let Some(path) = output_file {
+        fs::write(&path, &result)?;
+    }
 
     Ok(())
 }

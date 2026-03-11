@@ -80,6 +80,7 @@ Expand-Archive $ARCHIVE -DestinationPath .
 | `--base-url` | `ARK_BASE_URL` | `https://ark.cn-beijing.volces.com/api/v3` |
 | `--image-url` | `IMAGE_URL` | 示例图片 URL |
 | `--prompt` | `PROMPT` | `你看见了什么？` |
+| `--output` | `OUTPUT_FILE` | 不输出到文件 |
 
 推荐通过环境变量设置 API Key：
 
@@ -99,9 +100,12 @@ doubao-seed-skill --api-key YOUR_KEY --image-url /path/to/local/image.png
 # 自定义提示词
 doubao-seed-skill --api-key YOUR_KEY --image-url /path/to/image.jpg --prompt "描述图中的主要物体"
 
+# 将结果输出到文件（供 AI agent 读取）
+doubao-seed-skill --api-key YOUR_KEY --image-url /path/to/image.jpg --output /tmp/result.txt
+
 # 使用环境变量（推荐）
 export ARK_API_KEY="your-key"
-doubao-seed-skill --image-url /path/to/image.jpg --prompt "这张图片里有什么？"
+doubao-seed-skill --image-url /path/to/image.jpg --prompt "这张图片里有什么？" --output /tmp/result.txt
 ```
 
 ## 示例输出
