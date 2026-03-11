@@ -1,3 +1,8 @@
+---
+name: doubao-seed-skill
+description: 豆包图像分析技能：调用豆包（字节跳动）视觉大模型，分析图片内容
+---
+
 # doubao-seed-skill
 
 豆包图像分析技能：调用豆包（字节跳动）视觉大模型，分析图片内容。
