@@ -2,7 +2,7 @@
 
 Custom Claude Code skills for doubao-seed-skill project.
 
-For complete skills documentation, see [../SKILL.md](../SKILL.md).
+For complete skills documentation, see [doubao-seed-skill/SKILL.md](./doubao-seed-skill/SKILL.md).
 
 ## Implementation Details
 
