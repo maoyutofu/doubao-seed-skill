@@ -1,6 +1,6 @@
 ---
 name: doubao-seed-skill
-description: 豆包图像分析技能：调用豆包（字节跳动）视觉大模型，分析图片内容
+description: 豆包图像分析技能：调用豆包（字节跳动）视觉大模型，分析图片内容。AI agent 调用时，必须使用 --output 将结果写入临时文件（如 /tmp/doubao_result.txt），再通过读文件工具获取结果，禁止直接解析 stdout。
 ---
 
 # doubao-seed-skill
@@ -107,6 +107,24 @@ doubao-seed-skill --api-key YOUR_KEY --image-url /path/to/image.jpg --output /tm
 export ARK_API_KEY="your-key"
 doubao-seed-skill --image-url /path/to/image.jpg --prompt "这张图片里有什么？" --output /tmp/result.txt
 ```
+
+## AI Agent 调用指南
+
+**强烈建议 AI agent 使用 `--output` 输出文件模式，而非直接解析 stdout。**
+
+原因：stdout 可能混入日志、进度信息或 ANSI 转义码，直接解析容易出错；写入文件后再读取更可靠。
+
+推荐流程：
+
+```bash
+# 第一步：执行分析，结果写入临时文件
+doubao-seed-skill --image-url /path/to/image.jpg --output /tmp/doubao_result.txt
+
+# 第二步：通过读文件工具读取结果（而非解析命令输出）
+cat /tmp/doubao_result.txt
+```
+
+> 注意：每次调用建议使用唯一的临时文件路径（如 `/tmp/doubao_result_$$.txt`），避免并发时文件内容被覆盖。
 
 ## 示例输出
 
