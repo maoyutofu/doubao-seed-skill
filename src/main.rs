@@ -1,3 +1,4 @@
+use std::io::Write;
 use async_openai::{
     Client,
     config::OpenAIConfig,
@@ -121,6 +122,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("{}", content);
         }
     }
+
+    std::io::stdout().flush()?;
 
     Ok(())
 }
