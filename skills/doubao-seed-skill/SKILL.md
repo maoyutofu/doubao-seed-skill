@@ -1,70 +1,106 @@
-# Skills
+# doubao-seed-skill
 
-Custom Claude Code skills for doubao-seed-skill project.
+豆包图像分析技能：调用豆包（字节跳动）视觉大模型，分析图片内容。
 
-## Available Skills
+## 安装
 
-### `/install`
+从 GitHub Release 下载对应平台的二进制文件：
 
-Automatically install doubao-seed-skill binary for your system.
+**Release 地址：** `https://github.com/maoyutofu/doubao-seed-skill/releases/latest`
 
-**Description:**
+### 自动检测平台并下载
 
-Install doubao-seed-skill binary for the current system platform. Automatically detects the OS and architecture, downloads the pre-built binary from GitHub releases if available, or falls back to cloning and compiling from source.
+根据当前系统自动选择正确的包：
 
-**Usage:**
+| 系统 | 架构 | 文件名 |
+|------|------|--------|
+| Linux | x86_64 | `doubao-seed-skill-{version}-x86_64-unknown-linux-gnu.tar.gz` |
+| Linux | aarch64 | `doubao-seed-skill-{version}-aarch64-unknown-linux-gnu.tar.gz` |
+| macOS | x86_64 (Intel) | `doubao-seed-skill-{version}-x86_64-apple-darwin.tar.gz` |
+| macOS | aarch64 (Apple Silicon) | `doubao-seed-skill-{version}-aarch64-apple-darwin.tar.gz` |
+| Windows | x86_64 | `doubao-seed-skill-{version}-x86_64-pc-windows-msvc.zip` |
 
+### 下载步骤（Linux / macOS）
+
+```bash
+# 1. 获取最新版本号
+VERSION=$(curl -s https://api.github.com/repos/maoyutofu/doubao-seed-skill/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\(.*\)".*/\1/')
+
+# 2. 检测系统和架构
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+
+# 3. 映射到 target triple
+if [ "$OS" = "linux" ] && [ "$ARCH" = "x86_64" ]; then
+  TARGET="x86_64-unknown-linux-gnu"
+elif [ "$OS" = "linux" ] && [ "$ARCH" = "aarch64" ]; then
+  TARGET="aarch64-unknown-linux-gnu"
+elif [ "$OS" = "darwin" ] && [ "$ARCH" = "x86_64" ]; then
+  TARGET="x86_64-apple-darwin"
+elif [ "$OS" = "darwin" ] && [ "$ARCH" = "arm64" ]; then
+  TARGET="aarch64-apple-darwin"
+fi
+
+# 4. 下载并解压
+ARCHIVE="doubao-seed-skill-${VERSION}-${TARGET}.tar.gz"
+curl -LO "https://github.com/maoyutofu/doubao-seed-skill/releases/download/${VERSION}/${ARCHIVE}"
+tar -xzf "$ARCHIVE"
+
+# 5. 移动到 PATH（可选）
+sudo mv doubao-seed-skill /usr/local/bin/
 ```
-/install
+
+### 下载步骤（Windows PowerShell）
+
+```powershell
+# 1. 获取最新版本号
+$VERSION = (Invoke-RestMethod "https://api.github.com/repos/maoyutofu/doubao-seed-skill/releases/latest").tag_name
+
+# 2. 下载
+$ARCHIVE = "doubao-seed-skill-${VERSION}-x86_64-pc-windows-msvc.zip"
+Invoke-WebRequest "https://github.com/maoyutofu/doubao-seed-skill/releases/download/${VERSION}/${ARCHIVE}" -OutFile $ARCHIVE
+
+# 3. 解压
+Expand-Archive $ARCHIVE -DestinationPath .
 ```
 
-**Supported Platforms:**
+## 配置
 
-- Linux: x86_64, aarch64
-- macOS: x86_64, aarch64
-- Windows: x86_64
+需要豆包 API Key，通过 CLI 参数或环境变量传入：
 
-**How it works:**
-
-1. Detects current system platform (OS and architecture)
-2. Attempts to download pre-built binary from GitHub releases
-3. If release not found, clones the repository and compiles from source
-4. Installs the binary to `~/.local/bin/` (or `%APPDATA%\Local\bin\` on Windows)
-
-**Environment Variables:**
-
-- `INSTALL_DIR` - Custom installation directory (default: `~/.local/bin/`)
-
-**Notes:**
-
-- The binary is installed to `~/.local/bin/` by default. Make sure this directory is in your `$PATH`.
-- On Windows, the installation directory is `%APPDATA%\Local\bin\`.
-- Requires `git` and `cargo` for source compilation fallback.
-- Requires `curl` for downloading releases.
-
-**Usage:**
-
-```sh
-# Use environment variable parameters
-doubao-seed-skill --image-url ./photo.jpg --prompt "描述这张图片"
-
-# Using CLI flag & remote image URLs
-doubao-seed-skill --api-key sk-xxx --image-url https://example.com/img.png
-
-# Using CLI flag &  local images (automatically convert to base64)
-doubao-seed-skill --api-key sk-xxx --image-url ./photo.jpg --prompt "描述这张图片"
-
-# Using CLI flag & custom model & interface address
-doubao-seed-skill --api-key sk-xxx --base-url https://custom.api/v1 --model my-model --image-url ./img.png
-```
-**Parameter:**
-
-| CLI flag | Environment variables | Default |
-|---|---|---|
-| `--api-key` | `ARK_API_KEY` | Required |
-| `--model` | `ARK_MODEL` | `doubao-seed-2-0-lite-260215` |
+| CLI 参数 | 环境变量 | 默认值 |
+|----------|----------|--------|
+| `--api-key` | `ARK_API_KEY` | 必填 |
+| `--model` | `ARK_MODEL` | `ep-20260306183709-wgl6s` |
 | `--base-url` | `ARK_BASE_URL` | `https://ark.cn-beijing.volces.com/api/v3` |
-| `--image-url` | `IMAGE_URL` | Example Image URL |
-| `--prompt` | `PROMPT` | `What did you see?？` |
+| `--image-url` | `IMAGE_URL` | 示例图片 URL |
+| `--prompt` | `PROMPT` | `你看见了什么？` |
 
-Use environment variable parameters first.
+推荐通过环境变量设置 API Key：
+
+```bash
+export ARK_API_KEY="your-api-key-here"
+```
+
+## 使用
+
+```bash
+# 分析网络图片
+doubao-seed-skill --api-key YOUR_KEY --image-url https://example.com/image.jpg
+
+# 分析本地图片（自动转 base64）
+doubao-seed-skill --api-key YOUR_KEY --image-url /path/to/local/image.png
+
+# 自定义提示词
+doubao-seed-skill --api-key YOUR_KEY --image-url /path/to/image.jpg --prompt "描述图中的主要物体"
+
+# 使用环境变量（推荐）
+export ARK_API_KEY="your-key"
+doubao-seed-skill --image-url /path/to/image.jpg --prompt "这张图片里有什么？"
+```
+
+## 示例输出
+
+```
+图中是一只橙色的猫咪，正趴在窗台上晒太阳，背景是模糊的绿色植物。
+```
