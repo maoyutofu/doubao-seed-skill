@@ -2,6 +2,17 @@
 
 Rust 实现的豆包图像分析技能，通过 OpenAI 兼容接口调用豆包视觉模型。
 
+## 获取 API Key
+
+1. 访问 [火山引擎豆包大模型平台](https://console.volcengine.com/ark/)
+2. 注册/登录账号
+3. 在控制台获取 API Key
+
+## 创建推理点接入点
+1. 访问 [火山引擎豆控制台](https://console.volcengine.com/ark/)
+2. 点击 模型推理 - 在线推理 - 自定义推理点 - 创建推理接入点 配置 Doubao-Seed-2.0-lite 模型，点击创建并接入
+3. 复制接入点ID
+
 ## 安装
 
 ### 快速安装（推荐）
